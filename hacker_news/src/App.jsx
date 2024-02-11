@@ -3,6 +3,7 @@ import './App.css';
 
 function App() {
   const [topStories, setTopStories] = useState([]);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -29,18 +30,43 @@ function App() {
       }
     }
     fetchData();
-  });
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const searchResults = topStories.filter((story) => {
+      return story.title.toLowerCase().includes(searchText.toLowerCase());
+    });
+    setTopStories(searchResults);
+  };
+
+  const handleChange = (e) => {
+    setSearchText(e.target.value);
+  };
 
   return (
-<div className="App">
+    <div className="App">
       <h1>Hacker News</h1>
-      {topStories.length === 0 && <p>Loading...</p>}
-      {topStories.map((story, index) => (
-        <article key={story.id}>
-          <a href={story.url} target="_blank" rel="noreferrer">{story.title}</a>
-          <p>{''}by {story.by} | {story.score} points</p>
-        </article>
-      ))}
+      <form className="search-form" autoComplete='off' onSubmit={handleSubmit}>
+        <input 
+          type="text" 
+          name="search" 
+          id="search" 
+          placeholder="Search" 
+          value={searchText} 
+          onChange={handleChange} 
+        />
+        <button type="submit">Search</button>
+      </form>
+      <div className="news-container">
+        {topStories.length === 0 && <p>Loading...</p>}
+        {topStories.map((story, index) => (
+          <div className="news-card" key={story.id}>
+            <a href={story.url} target="_blank" rel="noreferrer">{story.title}</a>
+            <p>{''}by {story.by} | {story.score} points</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
